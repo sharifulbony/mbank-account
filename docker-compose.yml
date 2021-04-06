@@ -1,7 +1,23 @@
 version: '3.5'
 
 services:
+  app:
+    image: 'sharifulbony/mbank-account:latest'
+    build:
+      context: .
+    container_name: app
+    depends_on:
+      - postgres
+      - rbbit1
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/account
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=changeme
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+    networks:
+      - webproxy
   rbbit1:
+    container_name: rabbit-mq
     image: "rabbitmq:3-management"
     hostname: "rabbit1"
     environment:
@@ -14,11 +30,14 @@ services:
       - "5672:5672"
     labels:
       NAME: "rabbitmq1"
+    networks:
+      - webproxy
     volumes:
       - "./enabled_plugins:/etc/rabbitmq/enabled_plugins"
   postgres:
-    container_name: postgres_container
-    image: postgres
+    hostname: postgres
+    container_name: postgres
+    image: 'postgres:13.1-alpine'
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
@@ -28,7 +47,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - postgres
+      - webproxy
     restart: unless-stopped
 
   pgadmin:
@@ -42,11 +61,11 @@ services:
     ports:
       - "${PGADMIN_PORT:-5050}:80"
     networks:
-      - postgres
+      - webproxy
     restart: unless-stopped
 
 networks:
-  postgres:
+  webproxy:
     driver: bridge
 
 volumes:

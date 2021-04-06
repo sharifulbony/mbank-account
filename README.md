@@ -48,3 +48,32 @@ and use the login
 username: rabbit
 password: rabbit
 ```
+
+
+Deployment
+
+From local
+ * gradlew clean 
+* gradlew build
+* run the test cases if necessary
+* running from local requires postgres and rabbitMQ
+
+With Docker 
+    docker-compose up -d
+    
+    
+Things left
+* swagger documentation
+* more explanation before method starts
+* transaction estimation per second. can be done with jmeter
+
+
+Development decisions
+* initially discovered 4  entities . Created service and controller . Handled transaction with transactional annotation. 
+  Later added robust validation and exception  handeling
+  
+ Scaling
+ * both requirements fullfilled as 2 different microservices. DB and MQ  is dockerized. 
+ multiple deployment can be done using load balancer like nginx.
+ 
+ 
